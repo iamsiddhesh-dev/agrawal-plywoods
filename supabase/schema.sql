@@ -80,6 +80,13 @@ alter table public.listings         enable row level security;
 alter table public.contact_requests enable row level security;
 alter table public.app_config       enable row level security;
 
+-- Table-level privileges: anon may INSERT only (no select/update/delete).
+-- RLS policies below then constrain *what* rows the insert may create.
+-- Without these grants the insert fails at the privilege layer (401) before
+-- RLS is even evaluated.
+grant insert on public.listings         to anon;
+grant insert on public.contact_requests to anon;
+
 -- No SELECT/UPDATE/DELETE policies on listings for anon => denied.
 -- Sellers (anon) may only INSERT pending rows:
 create policy "anon inserts pending listings"

@@ -12,6 +12,21 @@
 // Exits non-zero if any check fails.
 // ============================================================================
 
+// Load supabase/.env (if present) so you don't have to paste the anon key each run.
+// Format: KEY=value per line. Real env vars still win. No dependency needed.
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+try {
+  const envPath = join(dirname(fileURLToPath(import.meta.url)), ".env");
+  for (const line of readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+} catch {
+  /* no .env file — rely on real env vars */
+}
+
 const URL = process.env.SUPABASE_URL?.replace(/\/$/, "");
 const ANON = process.env.SUPABASE_ANON_KEY;
 const PIN = process.env.ADMIN_PIN || "4321";
@@ -90,11 +105,13 @@ async function main() {
     );
   }
 
-  // 3a. insert a pending listing as anon → succeeds
+  // 3a. insert a pending listing as anon → succeeds.
+  // Use return=minimal: anon has no SELECT on listings, so return=representation
+  // would trigger a denied read-back and 401 even on a successful insert.
   {
     const r = await rest(`/listings`, {
       method: "POST",
-      headers: { Prefer: "return=representation" },
+      headers: { Prefer: "return=minimal" },
       body: JSON.stringify({
         name: "VERIFY temp pending",
         price_per_unit: 1,
@@ -103,7 +120,7 @@ async function main() {
         status: "pending",
       }),
     });
-    ok("anon can insert a pending listing", r.status === 201, `status=${r.status}`);
+    ok("anon can insert a pending listing", r.status === 201 || r.status === 204, `status=${r.status}`);
   }
 
   // 3b. insert with status='approved' → denied by RLS with-check

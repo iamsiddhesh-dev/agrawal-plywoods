@@ -1,0 +1,31 @@
+:root {
+  --text: #3f3a2f;
+  --text-h: #1c1810;
+  --bg: #fdf6e6;
+  --card-bg: #ffffff;
+  --border: #e3d9bd;
+  --accent: #a8662a;
+  --accent-hover: #8a5320;
+  --danger: #b3413a;
+  --danger-hover: #93332d;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 16px/145% var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  color: var(--text-h);
+  font-weight: 600;
+  margin: 0;
+}

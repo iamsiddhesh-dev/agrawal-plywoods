@@ -1,0 +1,204 @@
+.pin-gate {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 280px;
+  text-align: center;
+}
+
+.pin-gate-form h1 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.pin-gate-form input {
+  font-size: 20px;
+  letter-spacing: 8px;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.pin-gate-form button {
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.pin-gate-form button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.pin-gate-form button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.logout {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--text);
+  border-bottom: 2px solid transparent;
+}
+
+.tabs button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tab-header button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.error {
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+
+.empty {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--card-bg);
+  text-align: left;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  font-size: 11px;
+  text-align: center;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-body h3 {
+  font-size: 16px;
+}
+
+.notes {
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.approve {
+  background: var(--accent);
+}
+
+.approve:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.reject {
+  background: var(--danger);
+}
+
+.reject:hover:not(:disabled) {
+  background: var(--danger-hover);
+}

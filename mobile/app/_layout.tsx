@@ -9,8 +9,6 @@ export default function RootLayout() {
     >
       <Stack.Screen name="index" options={{ gestureEnabled: false }} />
       <Stack.Screen name="role-picker" options={{ gestureEnabled: false }} />
-      <Stack.Screen name="buyer" />
-      <Stack.Screen name="seller" />
     </Stack>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
 
 export default function RolePicker() {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Welcome</Text>
 
       <TouchableOpacity
@@ -55,6 +56,6 @@ export default function RolePicker() {
       >
         <Text style={styles.buttonText}>I'm a Seller</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }

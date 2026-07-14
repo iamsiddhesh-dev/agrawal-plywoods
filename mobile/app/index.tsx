@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, Image, Animated } from 'react-native';
+import { Image, Animated } from 'react-native';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Splash() {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -28,7 +29,7 @@ export default function Splash() {
   }, [fadeAnim, scaleAnim]);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
       <Animated.View
         style={{
           opacity: fadeAnim,
@@ -41,6 +42,6 @@ export default function Splash() {
           resizeMode="contain"
         />
       </Animated.View>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { fetchListings, PAGE_SIZE } from '../../src/lib/api';
 import type { PublicListing } from '../../src/types';
@@ -82,7 +83,7 @@ export default function BuyerFlow() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {loading && rows.length === 0 ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#4CAF50" />
@@ -117,6 +118,6 @@ export default function BuyerFlow() {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }

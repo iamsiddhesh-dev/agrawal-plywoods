@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../src/lib/supabase';
 import { createContactRequest, checkContactRequest } from '../../src/lib/api';
@@ -232,17 +233,17 @@ export default function ListingDetail() {
 
   if (loadingListing) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" color="#4CAF50" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (listingError || !listing) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <Text style={styles.errorText}>{listingError ?? 'Listing not found'}</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -251,81 +252,83 @@ export default function ListingDetail() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView>
-        {listing.photo_url ? (
-          <Image source={{ uri: listing.photo_url }} style={styles.image} resizeMode="cover" />
-        ) : (
-          <View style={styles.imagePlaceholder}>
-            <Text style={styles.imagePlaceholderText}>No photo</Text>
-          </View>
-        )}
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <ScrollView>
+          {listing.photo_url ? (
+            <Image source={{ uri: listing.photo_url }} style={styles.image} resizeMode="cover" />
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <Text style={styles.imagePlaceholderText}>No photo</Text>
+            </View>
+          )}
 
-        <View style={styles.body}>
-          <Text style={styles.name}>{listing.name}</Text>
-          <Text style={styles.price}>
-            ₹{listing.price_per_unit} / {listing.unit}
-          </Text>
-          <Text style={styles.meta}>Available: {listing.quantity_available} {listing.unit}</Text>
-          <Text style={styles.meta}>Seller: {listing.seller_name}</Text>
-          {listing.notes ? <Text style={styles.notes}>{listing.notes}</Text> : null}
+          <View style={styles.body}>
+            <Text style={styles.name}>{listing.name}</Text>
+            <Text style={styles.price}>
+              ₹{listing.price_per_unit} / {listing.unit}
+            </Text>
+            <Text style={styles.meta}>Available: {listing.quantity_available} {listing.unit}</Text>
+            <Text style={styles.meta}>Seller: {listing.seller_name}</Text>
+            {listing.notes ? <Text style={styles.notes}>{listing.notes}</Text> : null}
 
-          <Text style={styles.sectionTitle}>Contact</Text>
-          <View style={styles.contactBox}>
-            {checkingRequest ? (
-              <ActivityIndicator color="#4CAF50" />
-            ) : requestState.status === 'approved' ? (
-              <>
-                <Text style={styles.contactText}>Name: {requestState.seller_name}</Text>
-                <Text style={styles.contactText}>Phone: {requestState.seller_phone}</Text>
-                {requestState.seller_email ? (
-                  <Text style={styles.contactText}>Email: {requestState.seller_email}</Text>
-                ) : null}
-              </>
-            ) : requestState.status === 'pending' ? (
-              <Text style={styles.pendingText}>Request pending approval</Text>
-            ) : (
-              <>
-                <Text style={styles.contactText}>Phone: {listing.seller_phone_masked}</Text>
-                {listing.seller_email_masked ? (
-                  <Text style={styles.contactText}>Email: {listing.seller_email_masked}</Text>
-                ) : null}
+            <Text style={styles.sectionTitle}>Contact</Text>
+            <View style={styles.contactBox}>
+              {checkingRequest ? (
+                <ActivityIndicator color="#4CAF50" />
+              ) : requestState.status === 'approved' ? (
+                <>
+                  <Text style={styles.contactText}>Name: {requestState.seller_name}</Text>
+                  <Text style={styles.contactText}>Phone: {requestState.seller_phone}</Text>
+                  {requestState.seller_email ? (
+                    <Text style={styles.contactText}>Email: {requestState.seller_email}</Text>
+                  ) : null}
+                </>
+              ) : requestState.status === 'pending' ? (
+                <Text style={styles.pendingText}>Request pending approval</Text>
+              ) : (
+                <>
+                  <Text style={styles.contactText}>Phone: {listing.seller_phone_masked}</Text>
+                  {listing.seller_email_masked ? (
+                    <Text style={styles.contactText}>Email: {listing.seller_email_masked}</Text>
+                  ) : null}
 
-                {showForm ? (
-                  <>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Your name"
-                      value={buyerName}
-                      onChangeText={setBuyerName}
-                    />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Your phone number"
-                      value={buyerPhone}
-                      onChangeText={setBuyerPhone}
-                      keyboardType="phone-pad"
-                    />
-                    {formError ? <Text style={styles.formError}>{formError}</Text> : null}
-                    <TouchableOpacity
-                      style={[styles.requestButton, submitting && styles.requestButtonDisabled]}
-                      onPress={handleSubmitRequest}
-                      disabled={submitting}
-                    >
-                      <Text style={styles.requestButtonText}>
-                        {submitting ? 'Submitting…' : 'Submit Request'}
-                      </Text>
+                  {showForm ? (
+                    <>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Your name"
+                        value={buyerName}
+                        onChangeText={setBuyerName}
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Your phone number"
+                        value={buyerPhone}
+                        onChangeText={setBuyerPhone}
+                        keyboardType="phone-pad"
+                      />
+                      {formError ? <Text style={styles.formError}>{formError}</Text> : null}
+                      <TouchableOpacity
+                        style={[styles.requestButton, submitting && styles.requestButtonDisabled]}
+                        onPress={handleSubmitRequest}
+                        disabled={submitting}
+                      >
+                        <Text style={styles.requestButtonText}>
+                          {submitting ? 'Submitting…' : 'Submit Request'}
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <TouchableOpacity style={styles.requestButton} onPress={() => setShowForm(true)}>
+                      <Text style={styles.requestButtonText}>Request Contact</Text>
                     </TouchableOpacity>
-                  </>
-                ) : (
-                  <TouchableOpacity style={styles.requestButton} onPress={() => setShowForm(true)}>
-                    <Text style={styles.requestButtonText}>Request Contact</Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }

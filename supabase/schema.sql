@@ -100,7 +100,30 @@ create policy "anon inserts pending contact requests"
 
 -- app_config: no policies at all => nobody but definer functions can read it.
 
--- ============ BUYER RPC: check request / unlock contact ============
+-- ============ BUYER RPC: create request / check request / unlock contact ============
+-- anon has INSERT-only privilege on contact_requests (no SELECT policy), so a plain
+-- REST insert with return=representation (what supabase-js .select().single() sends)
+-- fails: PostgREST needs SELECT-policy visibility to return the row via RETURNING.
+-- This definer function inserts and hands back just the new id, keeping the
+-- "no direct SELECT" model intact while letting the client store the request id.
+create or replace function public.create_contact_request(
+  p_listing_id  uuid,
+  p_buyer_name  text,
+  p_buyer_phone text
+)
+returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  new_id uuid;
+begin
+  insert into contact_requests (listing_id, buyer_name, buyer_phone)
+  values (p_listing_id, p_buyer_name, p_buyer_phone)
+  returning id into new_id;
+  return new_id;
+end;
+$$;
+
+grant execute on function public.create_contact_request(uuid, text, text) to anon;
 
 create or replace function public.check_contact_request(p_request_id uuid)
 returns table (

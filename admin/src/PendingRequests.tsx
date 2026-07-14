@@ -54,7 +54,7 @@ export default function PendingRequests({ pin }: PendingRequestsProps) {
         {requests.map((request) => (
           <div className="card" key={request.id}>
             <div className="card-body">
-              <h3>{request.listing_name}</h3>
+              <h3 className="clamp-2">{request.listing_name}</h3>
               <p>
                 Buyer: {request.buyer_name} &middot; {request.buyer_phone}
               </p>

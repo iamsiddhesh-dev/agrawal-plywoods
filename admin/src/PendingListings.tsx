@@ -59,7 +59,7 @@ export default function PendingListings({ pin }: PendingListingsProps) {
               <div className="thumb thumb-placeholder">No photo</div>
             )}
             <div className="card-body">
-              <h3>{listing.name}</h3>
+              <h3 className="clamp-2">{listing.name}</h3>
               <p>
                 ₹{listing.price_per_unit} / {listing.unit} &middot; Qty:{' '}
                 {listing.quantity_available}

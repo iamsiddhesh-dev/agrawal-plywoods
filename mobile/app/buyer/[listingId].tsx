@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#c0392b',
     textAlign: 'center',
+    marginBottom: 16,
   },
   image: {
     width: '100%',
@@ -156,26 +157,30 @@ export default function ListingDetail() {
 
   const storageKey = `contact_request:${listingId}`;
 
+  const loadListing = React.useCallback(async () => {
+    if (!listingId) return;
+    setLoadingListing(true);
+    setListingError(null);
+    try {
+      const { data, error } = await supabase
+        .from('public_listings')
+        .select('*')
+        .eq('id', listingId)
+        .single();
+      if (error) throw error;
+      setListing(data as PublicListing);
+    } catch (e) {
+      setListingError(e instanceof Error ? e.message : 'Failed to load listing');
+    } finally {
+      setLoadingListing(false);
+    }
+  }, [listingId]);
+
   useEffect(() => {
     if (listing || !listingId) return;
-    (async () => {
-      setLoadingListing(true);
-      setListingError(null);
-      try {
-        const { data, error } = await supabase
-          .from('public_listings')
-          .select('*')
-          .eq('id', listingId)
-          .single();
-        if (error) throw error;
-        setListing(data as PublicListing);
-      } catch (e) {
-        setListingError(e instanceof Error ? e.message : 'Failed to load listing');
-      } finally {
-        setLoadingListing(false);
-      }
-    })();
-  }, [listing, listingId]);
+    loadListing();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId]);
 
   useEffect(() => {
     if (!listingId) return;
@@ -243,6 +248,11 @@ export default function ListingDetail() {
     return (
       <SafeAreaView style={styles.center}>
         <Text style={styles.errorText}>{listingError ?? 'Listing not found'}</Text>
+        {listingError ? (
+          <TouchableOpacity style={styles.requestButton} onPress={loadListing}>
+            <Text style={styles.requestButtonText}>Retry</Text>
+          </TouchableOpacity>
+        ) : null}
       </SafeAreaView>
     );
   }

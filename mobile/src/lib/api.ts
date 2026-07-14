@@ -1,7 +1,12 @@
+import { decode } from 'base64-arraybuffer';
 import { supabase } from './supabase';
 import type { ContactCheckResponse, PublicListing } from '../types';
 
 export const PAGE_SIZE = 10;
+
+function randomId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 export async function fetchListings(
   page: number
@@ -46,4 +51,46 @@ export async function checkContactRequest(
   if (error) throw error;
 
   return data as ContactCheckResponse;
+}
+
+export async function uploadListingPhoto(base64: string): Promise<string> {
+  const path = `${randomId()}.jpg`;
+
+  const { error } = await supabase.storage
+    .from('listing-photos')
+    .upload(path, decode(base64), { contentType: 'image/jpeg' });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from('listing-photos').getPublicUrl(path);
+
+  return data.publicUrl;
+}
+
+export interface NewListingInput {
+  name: string;
+  pricePerUnit: number;
+  unit: string;
+  quantityAvailable: number;
+  notes?: string;
+  photoUrl?: string;
+  sellerName: string;
+  sellerPhone: string;
+  sellerEmail?: string;
+}
+
+export async function createListing(input: NewListingInput): Promise<void> {
+  const { error } = await supabase.from('listings').insert({
+    name: input.name,
+    price_per_unit: input.pricePerUnit,
+    unit: input.unit,
+    quantity_available: input.quantityAvailable,
+    notes: input.notes || null,
+    photo_url: input.photoUrl || null,
+    seller_name: input.sellerName,
+    seller_phone: input.sellerPhone,
+    seller_email: input.sellerEmail || null,
+  });
+
+  if (error) throw error;
 }

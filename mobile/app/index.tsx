@@ -29,7 +29,7 @@ export default function Splash() {
   }, [fadeAnim, scaleAnim]);
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fdf6e6' }}>
       <Animated.View
         style={{
           opacity: fadeAnim,
@@ -38,7 +38,7 @@ export default function Splash() {
       >
         <Image
           source={require('../assets/logo.png')}
-          style={{ width: 120, height: 120 }}
+          style={{ width: 220, height: 220 }}
           resizeMode="contain"
         />
       </Animated.View>

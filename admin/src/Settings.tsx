@@ -126,12 +126,12 @@ export default function Settings({ pin, onPinChanged }: SettingsProps) {
             {success && <p className="success-msg">PIN updated — please re-enter to continue.</p>}
 
             <div className="form-actions">
-              <button className="pin-change-submit" type="submit" disabled={saving}>
+              <button className="btn btn-primary" type="submit" disabled={saving}>
                 {saving ? 'Saving...' : 'Change PIN'}
               </button>
               <button
                 type="button"
-                className="ghost-btn"
+                className="btn btn-ghost"
                 onClick={() => { setOpen(false); resetForm(); }}
                 disabled={saving}
               >

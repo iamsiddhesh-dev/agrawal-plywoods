@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { addListing, deleteListing, fetchAllListings, updateListing } from './lib/api';
 import ListingForm from './ListingForm';
+import Modal from './Modal';
 import type { AdminListing, NewListingInput } from './types';
 
 interface MyStockProps {
@@ -12,8 +13,9 @@ export default function MyStock({ pin }: MyStockProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -36,6 +38,7 @@ export default function MyStock({ pin }: MyStockProps) {
     try {
       await deleteListing(pin, id);
       setListings((prev) => prev.filter((l) => l.id !== id));
+      setDeletingId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Delete failed');
     } finally {
@@ -45,7 +48,7 @@ export default function MyStock({ pin }: MyStockProps) {
 
   async function handleAdd(input: NewListingInput) {
     await addListing(pin, input);
-    setShowAddForm(false);
+    setShowAddModal(false);
     load();
   }
 
@@ -55,74 +58,99 @@ export default function MyStock({ pin }: MyStockProps) {
     load();
   }
 
+  const editingListing = listings.find((l) => l.id === editingId) ?? null;
+  const deletingListing = listings.find((l) => l.id === deletingId) ?? null;
+
   return (
     <div>
       <div className="tab-header">
         <h2>My Stock</h2>
-        <button onClick={() => { setShowAddForm((v) => !v); setEditingId(null); }}>
-          {showAddForm ? 'Cancel' : '+ Add Listing'}
+        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(true)}>
+          + Add Listing
         </button>
       </div>
-
-      {showAddForm && (
-        <ListingForm submitLabel="Add to Stock" onSubmit={handleAdd} onCancel={() => setShowAddForm(false)} />
-      )}
 
       {error && <p className="error">{error}</p>}
       {!loading && listings.length === 0 && <p className="empty">No listings yet.</p>}
       <div className="card-list">
         {listings.map((listing) => (
-          <div className="card-block" key={listing.id}>
-            <div className="card">
-              {listing.photo_url ? (
-                <img src={listing.photo_url} alt={listing.name} className="thumb" />
-              ) : (
-                <div className="thumb thumb-placeholder">No photo</div>
-              )}
-              <div className="card-body">
-                <h3 className="clamp-2">{listing.name}</h3>
-                <p>
-                  ₹{listing.price_per_unit} / {listing.unit} &middot; Qty: {listing.quantity_available}
-                  {' · '}
-                  <span className={`status-badge status-${listing.status}`}>{listing.status}</span>
-                </p>
-                <div className="actions">
-                  <button
-                    onClick={() => { setEditingId(editingId === listing.id ? null : listing.id); setShowAddForm(false); }}
-                  >
-                    {editingId === listing.id ? 'Close' : 'Edit'}
-                  </button>
-                  <button
-                    className="reject"
-                    disabled={busyId === listing.id}
-                    onClick={() => handleDelete(listing.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
+          <div className="card" key={listing.id}>
+            {listing.photo_url ? (
+              <img src={listing.photo_url} alt={listing.name} className="thumb" />
+            ) : (
+              <div className="thumb thumb-placeholder">No photo</div>
+            )}
+            <div className="card-body">
+              <h3 className="clamp-2">{listing.name}</h3>
+              <p>
+                ₹{listing.price_per_unit} / {listing.unit} &middot; Qty: {listing.quantity_available}
+                {' · '}
+                <span className={`status-badge status-${listing.status}`}>{listing.status}</span>
+              </p>
+              <div className="actions">
+                <button className="btn btn-edit btn-sm" onClick={() => setEditingId(listing.id)}>
+                  Edit
+                </button>
+                <button
+                  className="btn btn-reject btn-sm"
+                  disabled={busyId === listing.id}
+                  onClick={() => setDeletingId(listing.id)}
+                >
+                  Delete
+                </button>
               </div>
             </div>
-            {editingId === listing.id && (
-              <ListingForm
-                submitLabel="Save Changes"
-                onCancel={() => setEditingId(null)}
-                initial={{
-                  name: listing.name,
-                  price: listing.price_per_unit,
-                  unit: listing.unit,
-                  quantity: listing.quantity_available,
-                  notes: listing.notes ?? '',
-                  photoUrl: listing.photo_url ?? '',
-                  sellerName: listing.seller_name,
-                  sellerPhone: listing.seller_phone,
-                  sellerEmail: listing.seller_email ?? '',
-                }}
-                onSubmit={(input) => handleEdit(listing.id, input)}
-              />
-            )}
           </div>
         ))}
       </div>
+
+      {showAddModal && (
+        <Modal title="Add Listing" onClose={() => setShowAddModal(false)}>
+          <ListingForm submitLabel="Add to Stock" onSubmit={handleAdd} onCancel={() => setShowAddModal(false)} />
+        </Modal>
+      )}
+
+      {editingListing && (
+        <Modal title={`Edit — ${editingListing.name}`} onClose={() => setEditingId(null)}>
+          <ListingForm
+            submitLabel="Save Changes"
+            onCancel={() => setEditingId(null)}
+            initial={{
+              name: editingListing.name,
+              price: editingListing.price_per_unit,
+              unit: editingListing.unit,
+              quantity: editingListing.quantity_available,
+              notes: editingListing.notes ?? '',
+              photoUrl: editingListing.photo_url ?? '',
+              sellerName: editingListing.seller_name,
+              sellerPhone: editingListing.seller_phone,
+              sellerEmail: editingListing.seller_email ?? '',
+            }}
+            onSubmit={(input) => handleEdit(editingListing.id, input)}
+          />
+        </Modal>
+      )}
+
+      {deletingListing && (
+        <Modal title="Delete listing?" onClose={() => setDeletingId(null)}>
+          <p className="confirm-message">
+            Are you sure you want to delete <strong>{deletingListing.name}</strong>? This will remove it
+            entirely, including its price, quantity, and seller info — this can't be undone.
+          </p>
+          <div className="form-actions">
+            <button
+              className="btn btn-reject"
+              disabled={busyId === deletingListing.id}
+              onClick={() => handleDelete(deletingListing.id)}
+            >
+              {busyId === deletingListing.id ? 'Deleting...' : 'Delete'}
+            </button>
+            <button className="btn btn-ghost" onClick={() => setDeletingId(null)} disabled={busyId === deletingListing.id}>
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

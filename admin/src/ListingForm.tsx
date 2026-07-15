@@ -101,11 +101,11 @@ export default function ListingForm({ initial, submitLabel, onSubmit, onCancel }
       {error && <p className="error">{error}</p>}
 
       <div className="form-actions">
-        <button className="approve" type="submit" disabled={submitting}>
+        <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? 'Saving...' : submitLabel}
         </button>
         {onCancel && (
-          <button type="button" className="ghost-btn" onClick={onCancel} disabled={submitting}>
+          <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={submitting}>
             Cancel
           </button>
         )}

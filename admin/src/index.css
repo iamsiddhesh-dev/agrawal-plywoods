@@ -31,9 +31,31 @@ body {
   margin: 0;
 }
 
-h1, h2, h3 {
+/* Browsers don't inherit the page font into form controls by default —
+   without this, every button/input/select silently falls back to the OS
+   UI font, which is why buttons look out of sync with headings and text. */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1, h2, h3, h4 {
   color: var(--text-h);
   font-family: var(--serif);
   font-weight: 600;
   margin: 0;
+}
+
+h1 { font-size: 22px; }
+h2 { font-size: 19px; }
+h3 { font-size: 16px; }
+h4 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-hover);
+}
+
+p, label, span {
+  font-family: var(--sans);
 }

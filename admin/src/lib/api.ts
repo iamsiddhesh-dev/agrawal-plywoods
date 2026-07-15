@@ -73,6 +73,23 @@ export async function deleteListing(pin: string, id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function updateListing(pin: string, id: string, input: NewListingInput): Promise<void> {
+  const { error } = await supabase.rpc('admin_update_listing', {
+    p_pin: pin,
+    p_id: id,
+    p_name: input.name,
+    p_price: input.price,
+    p_unit: input.unit,
+    p_quantity: input.quantity,
+    p_notes: input.notes || null,
+    p_photo_url: input.photoUrl || null,
+    p_seller_name: input.sellerName,
+    p_seller_phone: input.sellerPhone,
+    p_seller_email: input.sellerEmail || null,
+  });
+  if (error) throw error;
+}
+
 export async function changePin(pin: string, newPin: string): Promise<void> {
   const { error } = await supabase.rpc('admin_change_pin', { p_pin: pin, p_new_pin: newPin });
   if (error) throw error;

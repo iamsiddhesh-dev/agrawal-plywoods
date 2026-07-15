@@ -230,6 +230,42 @@ end $$;
 
 grant execute on function public.admin_delete_listing(text, uuid) to anon;
 
+-- Admin edits any field on any listing, regardless of status (full ownership:
+-- adjust price, quantity, photo, notes, or seller info on a pending, approved,
+-- or rejected listing without deleting/recreating it).
+create or replace function public.admin_update_listing(
+  p_pin          text,
+  p_id           uuid,
+  p_name         text,
+  p_price        numeric,
+  p_unit         text,
+  p_quantity     integer,
+  p_notes        text,
+  p_photo_url    text,
+  p_seller_name  text,
+  p_seller_phone text,
+  p_seller_email text
+)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not public.admin_pin_ok(p_pin) then raise exception 'invalid pin'; end if;
+  update listings set
+    name               = p_name,
+    price_per_unit     = p_price,
+    unit               = p_unit,
+    quantity_available = p_quantity,
+    notes              = p_notes,
+    photo_url          = p_photo_url,
+    seller_name        = p_seller_name,
+    seller_phone       = p_seller_phone,
+    seller_email       = p_seller_email
+  where id = p_id;
+end $$;
+
+grant execute on function public.admin_update_listing(
+  text, uuid, text, numeric, text, integer, text, text, text, text, text
+) to anon;
+
 -- Admin views all listings (any status) for own-stock management.
 create or replace function public.admin_all_listings(p_pin text)
 returns setof public.listings

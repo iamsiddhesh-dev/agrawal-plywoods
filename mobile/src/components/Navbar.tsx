@@ -87,7 +87,7 @@ export default function Navbar({
   showBack?: boolean;
 }) {
   const { items } = useCart();
-  const cartCount = items.reduce((sum, i) => sum + i.qty, 0);
+  const cartCount = items.length;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

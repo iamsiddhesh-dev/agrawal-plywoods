@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -27,6 +28,18 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    // Chrome's mobile "tap highlight" paints a translucent blue flash over
+    // any tapped element on web (native has no such artifact). +html.tsx
+    // only covers static exports, not `expo start --web`, so also inject
+    // this at runtime for dev.
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = '* { -webkit-tap-highlight-color: transparent; }';
+      document.head.appendChild(style);
+    }
+  }, []);
 
   if (!fontsLoaded) return null;
 

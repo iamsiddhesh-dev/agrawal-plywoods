@@ -75,11 +75,22 @@ const styles = StyleSheet.create({
     color: colors.gold,
     marginTop: 2,
   },
-  removeText: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 13,
+  rightCol: {
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  removeBox: {
+    borderWidth: 1,
+    borderColor: colors.danger,
+    borderRadius: radii.sm,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  removeBoxText: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 12,
     color: colors.danger,
-    marginTop: 6,
   },
   totalBar: {
     padding: spacing.lg,
@@ -176,15 +187,21 @@ export default function Cart() {
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
         <Text style={styles.price}>₹{item.pricePerUnit} / {item.unit}</Text>
-        <TouchableOpacity onPress={() => setConfirmRemoveId(item.listingId)}>
-          <Text style={styles.removeText}>Remove</Text>
+      </View>
+      <View style={styles.rightCol}>
+        <QtyStepper
+          value={item.qty}
+          max={item.quantityAvailable}
+          onChange={(next) => updateQty(item.listingId, next)}
+        />
+        <TouchableOpacity
+          style={styles.removeBox}
+          activeOpacity={0.7}
+          onPress={() => setConfirmRemoveId(item.listingId)}
+        >
+          <Text style={styles.removeBoxText}>Remove</Text>
         </TouchableOpacity>
       </View>
-      <QtyStepper
-        value={item.qty}
-        max={item.quantityAvailable}
-        onChange={(next) => updateQty(item.listingId, next)}
-      />
     </View>
   );
 

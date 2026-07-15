@@ -64,7 +64,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (listingId: string, qty: number) => {
       setItems((prev) => {
         const next = prev.map((i) =>
-          i.listingId === listingId ? { ...i, qty: Math.max(1, Math.min(qty, i.quantityAvailable)) } : i
+          i.listingId === listingId ? { ...i, qty: Math.max(0, Math.min(qty, i.quantityAvailable)) } : i
         );
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
         return next;

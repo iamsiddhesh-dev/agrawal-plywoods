@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart, type CartItem } from '../../src/lib/cartStore';
 import QtyStepper from '../../src/components/QtyStepper';
-import { colors, fonts, radii, spacing } from '../../src/theme';
+import { colors, fonts, radii, spacing, shadow } from '../../src/theme';
 
 const styles = StyleSheet.create({
   container: {
@@ -95,15 +95,76 @@ const styles = StyleSheet.create({
     color: colors.muted,
   },
   totalValue: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 24,
+    color: colors.gold,
+  },
+  confirmBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(26,26,26,0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  confirmBox: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: colors.white,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    padding: spacing.xl,
+    alignItems: 'center',
+    ...shadow,
+  },
+  confirmTitle: {
     fontFamily: fonts.heading,
-    fontSize: 20,
+    fontSize: 18,
     color: colors.black,
+    textAlign: 'center',
+  },
+  confirmMessage: {
+    fontFamily: fonts.body,
+    fontSize: 14,
+    color: colors.muted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.xl,
+    width: '100%',
+  },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: radii.sm,
+    alignItems: 'center',
+  },
+  confirmBtnCancel: {
+    backgroundColor: colors.ivoryDark,
+  },
+  confirmBtnCancelText: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 14,
+    color: colors.black,
+  },
+  confirmBtnRemove: {
+    backgroundColor: colors.danger,
+  },
+  confirmBtnRemoveText: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 14,
+    color: colors.white,
   },
 });
 
 export default function Cart() {
   const { items, updateQty, removeFromCart } = useCart();
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const total = items.reduce((sum, i) => sum + i.pricePerUnit * i.qty, 0);
+  const confirmItem = items.find((i) => i.listingId === confirmRemoveId) ?? null;
 
   const renderItem = ({ item }: { item: CartItem }) => (
     <View style={styles.card}>
@@ -115,7 +176,7 @@ export default function Cart() {
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
         <Text style={styles.price}>₹{item.pricePerUnit} / {item.unit}</Text>
-        <TouchableOpacity onPress={() => removeFromCart(item.listingId)}>
+        <TouchableOpacity onPress={() => setConfirmRemoveId(item.listingId)}>
           <Text style={styles.removeText}>Remove</Text>
         </TouchableOpacity>
       </View>
@@ -155,6 +216,39 @@ export default function Cart() {
           </View>
         </>
       )}
+
+      <Modal
+        visible={!!confirmItem}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setConfirmRemoveId(null)}
+      >
+        <View style={styles.confirmBackdrop}>
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>Remove item?</Text>
+            <Text style={styles.confirmMessage}>
+              {confirmItem ? `Remove "${confirmItem.name}" from your cart?` : ''}
+            </Text>
+            <View style={styles.confirmActions}>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.confirmBtnCancel]}
+                onPress={() => setConfirmRemoveId(null)}
+              >
+                <Text style={styles.confirmBtnCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.confirmBtnRemove]}
+                onPress={() => {
+                  if (confirmRemoveId) removeFromCart(confirmRemoveId);
+                  setConfirmRemoveId(null);
+                }}
+              >
+                <Text style={styles.confirmBtnRemoveText}>Sure, Remove</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

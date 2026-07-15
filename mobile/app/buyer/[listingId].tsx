@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Modal,
   StyleSheet,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -18,6 +19,7 @@ import { supabase } from '../../src/lib/supabase';
 import { createContactRequest, checkContactRequest } from '../../src/lib/api';
 import { useCart } from '../../src/lib/cartStore';
 import QtyStepper from '../../src/components/QtyStepper';
+import Navbar from '../../src/components/Navbar';
 import type { PublicListing } from '../../src/types';
 import { colors, fonts, radii, spacing } from '../../src/theme';
 
@@ -177,6 +179,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,
   },
+  imageModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageModalCloseBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  imageModalCloseText: {
+    color: colors.white,
+    fontSize: 20,
+    fontFamily: fonts.bodyBold,
+  },
+  imageModalImage: {
+    width: '100%',
+    height: '80%',
+  },
 });
 
 type RequestState =
@@ -209,6 +238,7 @@ export default function ListingDetail() {
   const [cartQty, setCartQty] = useState(1);
   const [stockMsg, setStockMsg] = useState<string | null>(null);
   const [addedLabel, setAddedLabel] = useState(false);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
 
   const storageKey = `contact_request:${listingId}`;
 
@@ -293,17 +323,16 @@ export default function ListingDetail() {
 
   const handleQtyChange = (next: number) => {
     if (!listing) return;
-    if (next > listing.quantity_available) {
-      setStockMsg(`Only ${listing.quantity_available} available`);
-      setCartQty(listing.quantity_available);
-      return;
-    }
-    setStockMsg(null);
+    setStockMsg(next >= listing.quantity_available ? `Only ${listing.quantity_available} available` : null);
     setCartQty(next);
   };
 
   const handleAddToCart = () => {
     if (!listing) return;
+    if (cartQty <= 0) {
+      setStockMsg("No quantity selected — this can't be added to the cart");
+      return;
+    }
     addToCart(
       {
         listingId: listing.id,
@@ -321,21 +350,27 @@ export default function ListingDetail() {
 
   if (loadingListing) {
     return (
-      <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.gold} />
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <Navbar role="buyer" showBack />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.gold} />
+        </View>
       </SafeAreaView>
     );
   }
 
   if (listingError || !listing) {
     return (
-      <SafeAreaView style={styles.center}>
-        <Text style={styles.errorText}>{listingError ?? 'Listing not found'}</Text>
-        {listingError ? (
-          <TouchableOpacity style={styles.requestButton} onPress={loadListing}>
-            <Text style={styles.requestButtonText}>Retry</Text>
-          </TouchableOpacity>
-        ) : null}
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <Navbar role="buyer" showBack />
+        <View style={styles.center}>
+          <Text style={styles.errorText}>{listingError ?? 'Listing not found'}</Text>
+          {listingError ? (
+            <TouchableOpacity style={styles.requestButton} onPress={loadListing}>
+              <Text style={styles.requestButtonText}>Retry</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </SafeAreaView>
     );
   }
@@ -343,17 +378,23 @@ export default function ListingDetail() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <ScrollView>
-          {listing.photo_url ? (
-            <Image source={{ uri: listing.photo_url }} style={styles.image} resizeMode="cover" />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Text style={styles.imagePlaceholderText}>No photo</Text>
-            </View>
-          )}
+      <Navbar role="buyer" showBack />
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <ScrollView keyboardShouldPersistTaps="handled">
+          <TouchableOpacity
+            activeOpacity={listing.photo_url ? 0.85 : 1}
+            onPress={() => listing.photo_url && setImageModalVisible(true)}
+          >
+            {listing.photo_url ? (
+              <Image source={{ uri: listing.photo_url }} style={styles.image} resizeMode="cover" />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.imagePlaceholderText}>No photo</Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.body}>
             <Text style={styles.name}>{listing.name}</Text>
@@ -361,7 +402,6 @@ export default function ListingDetail() {
               ₹{listing.price_per_unit} / {listing.unit}
             </Text>
             <Text style={styles.meta}>Available: {listing.quantity_available} {listing.unit}</Text>
-            <Text style={styles.meta}>Seller: {listing.seller_name}</Text>
             {listing.notes ? <Text style={styles.notes}>{listing.notes}</Text> : null}
 
             <View style={styles.stepperWrap}>
@@ -376,11 +416,11 @@ export default function ListingDetail() {
 
             <Text style={styles.sectionTitle}>Contact</Text>
             <View style={styles.contactBox}>
+              <Text style={styles.contactText}>Name: {listing.seller_name}</Text>
               {checkingRequest ? (
                 <ActivityIndicator color={colors.gold} />
               ) : requestState.status === 'approved' ? (
                 <>
-                  <Text style={styles.contactText}>Name: {requestState.seller_name}</Text>
                   <Text style={styles.contactText}>Phone: {requestState.seller_phone}</Text>
                   {requestState.seller_email ? (
                     <Text style={styles.contactText}>Email: {requestState.seller_email}</Text>
@@ -434,6 +474,25 @@ export default function ListingDetail() {
           </View>
         </ScrollView>
       </SafeAreaView>
+
+      <Modal
+        visible={imageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setImageModalVisible(false)}
+      >
+        <View style={styles.imageModalBackdrop}>
+          <TouchableOpacity
+            style={styles.imageModalCloseBtn}
+            onPress={() => setImageModalVisible(false)}
+          >
+            <Text style={styles.imageModalCloseText}>✕</Text>
+          </TouchableOpacity>
+          {listing.photo_url ? (
+            <Image source={{ uri: listing.photo_url }} style={styles.imageModalImage} resizeMode="contain" />
+          ) : null}
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

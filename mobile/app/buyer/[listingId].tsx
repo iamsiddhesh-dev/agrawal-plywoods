@@ -189,18 +189,24 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50,
     right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(26,26,26,0.5)',
+    borderWidth: 1,
+    borderColor: colors.gold,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
   imageModalCloseText: {
-    color: colors.white,
-    fontSize: 20,
-    fontFamily: fonts.bodyBold,
+    color: colors.goldLight,
+    fontSize: 16,
+    fontFamily: fonts.body,
   },
   imageModalImage: {
     width: '100%',
@@ -485,6 +491,8 @@ export default function ListingDetail() {
           <TouchableOpacity
             style={styles.imageModalCloseBtn}
             onPress={() => setImageModalVisible(false)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Text style={styles.imageModalCloseText}>✕</Text>
           </TouchableOpacity>

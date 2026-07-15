@@ -59,3 +59,11 @@ h4 {
 p, label, span {
   font-family: var(--sans);
 }
+
+/* Mobile Chrome paints a translucent blue rectangle over tapped elements
+   by default (the "tap highlight") — kills that flash on every clickable
+   surface, not just <button>s, so cards and the delete-confirm dialog
+   don't flicker blue on tap. */
+a, button, [role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}

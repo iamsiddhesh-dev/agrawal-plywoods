@@ -66,8 +66,14 @@ export default function PendingListings({ pin }: PendingListingsProps) {
               </p>
               {listing.notes && <p className="notes">{listing.notes}</p>}
               <p>
-                Seller: {listing.seller_name} &middot; {listing.seller_phone}
-                {listing.seller_email ? ` · ${listing.seller_email}` : ''}
+                Seller: {listing.seller_name} &middot;{' '}
+                <span className="contact-highlight">{listing.seller_phone}</span>
+                {listing.seller_email ? (
+                  <>
+                    {' · '}
+                    <span className="contact-highlight">{listing.seller_email}</span>
+                  </>
+                ) : ''}
               </p>
               <div className="actions">
                 <button

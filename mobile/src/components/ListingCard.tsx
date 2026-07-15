@@ -2,48 +2,48 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import type { PublicListing } from '../types';
+import { colors, fonts, radii, shadow } from '../theme';
 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 8,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadow,
   },
   image: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.ivoryDark,
   },
   imagePlaceholder: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.ivoryDark,
     justifyContent: 'center',
     alignItems: 'center',
   },
   imagePlaceholderText: {
-    color: '#999',
+    color: colors.muted,
     fontSize: 12,
+    fontFamily: fonts.body,
   },
   body: {
     padding: 10,
   },
   name: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontFamily: fonts.bodySemiBold,
+    color: colors.black,
   },
   price: {
     fontSize: 13,
-    color: '#4CAF50',
-    fontWeight: '700',
+    color: colors.gold,
+    fontFamily: fonts.bodyBold,
     marginTop: 4,
   },
 });

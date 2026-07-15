@@ -13,40 +13,48 @@ import {
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PhotoPicker from '../../src/components/PhotoPicker';
+import Navbar from '../../src/components/Navbar';
 import { createListing, uploadListingPhoto } from '../../src/lib/api';
+import { colors, fonts, radii, spacing } from '../../src/theme';
 
 const UNITS = ['sheet', 'sq ft', 'piece'];
+
+function toTitleCase(s: string): string {
+  return s.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.ivory,
   },
   scrollBody: {
-    padding: 16,
+    padding: spacing.lg,
     paddingBottom: 40,
   },
   title: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 16,
+    fontFamily: fonts.heading,
+    color: colors.black,
+    marginBottom: spacing.lg,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#555',
-    marginTop: 16,
+    fontFamily: fonts.bodySemiBold,
+    color: colors.muted,
+    marginTop: spacing.lg,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
-    backgroundColor: '#fff',
+    fontFamily: fonts.body,
+    backgroundColor: colors.white,
+    color: colors.black,
   },
   notesInput: {
     minHeight: 80,
@@ -59,41 +67,42 @@ const styles = StyleSheet.create({
   unitChip: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radii.sm,
     paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   unitChipSelected: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
+    backgroundColor: colors.gold,
+    borderColor: colors.gold,
   },
   unitChipText: {
-    color: '#555',
-    fontWeight: '600',
+    color: colors.muted,
+    fontFamily: fonts.bodySemiBold,
   },
   unitChipTextSelected: {
-    color: '#fff',
+    color: colors.white,
   },
   errorText: {
-    color: '#c0392b',
+    color: colors.danger,
+    fontFamily: fonts.body,
     fontSize: 13,
     marginTop: 14,
   },
   submitButton: {
     marginTop: 24,
-    backgroundColor: '#2196F3',
+    backgroundColor: colors.black,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: radii.md,
     alignItems: 'center',
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#fff',
-    fontWeight: '700',
+    color: colors.white,
+    fontFamily: fonts.bodyBold,
     fontSize: 16,
   },
   successContainer: {
@@ -104,26 +113,27 @@ const styles = StyleSheet.create({
   },
   successTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
+    fontFamily: fonts.heading,
+    color: colors.black,
     textAlign: 'center',
   },
   successSubtitle: {
     fontSize: 14,
-    color: '#666',
+    fontFamily: fonts.body,
+    color: colors.muted,
     marginTop: 8,
     textAlign: 'center',
   },
   doneButton: {
     marginTop: 24,
-    backgroundColor: '#2196F3',
+    backgroundColor: colors.gold,
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 8,
+    borderRadius: radii.md,
   },
   doneButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: colors.white,
+    fontFamily: fonts.bodySemiBold,
     fontSize: 15,
   },
 });
@@ -156,24 +166,22 @@ export default function SellerFlow() {
     if (!quantity.trim() || !Number.isInteger(qty) || qty < 0) {
       return setError('Enter a valid whole-number quantity.');
     }
+    if (!photoBase64) return setError('A product photo is required.');
     if (!sellerName.trim()) return setError('Your name is required.');
     if (!sellerPhone.trim()) return setError('Your phone number is required.');
 
     setSubmitting(true);
     try {
-      let photoUrl: string | undefined;
-      if (photoBase64) {
-        photoUrl = await uploadListingPhoto(photoBase64);
-      }
+      const photoUrl = await uploadListingPhoto(photoBase64);
 
       await createListing({
-        name: name.trim(),
+        name: toTitleCase(name.trim()),
         pricePerUnit: price,
         unit,
         quantityAvailable: qty,
         notes: notes.trim(),
         photoUrl,
-        sellerName: sellerName.trim(),
+        sellerName: toTitleCase(sellerName.trim()),
         sellerPhone: sellerPhone.trim(),
         sellerEmail: sellerEmail.trim(),
       });
@@ -207,7 +215,8 @@ export default function SellerFlow() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <Navbar role="seller" />
         <ScrollView contentContainerStyle={styles.scrollBody} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Add Listing</Text>
 
@@ -215,8 +224,10 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="e.g. 18mm Marine Ply 8x4"
+            placeholderTextColor={colors.muted}
             value={name}
             onChangeText={setName}
+            autoCapitalize="words"
             editable={!submitting}
           />
 
@@ -224,6 +235,7 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="0.00"
+            placeholderTextColor={colors.muted}
             value={pricePerUnit}
             onChangeText={setPricePerUnit}
             keyboardType="decimal-pad"
@@ -248,6 +260,7 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="0"
+            placeholderTextColor={colors.muted}
             value={quantity}
             onChangeText={setQuantity}
             keyboardType="number-pad"
@@ -258,13 +271,14 @@ export default function SellerFlow() {
           <TextInput
             style={[styles.input, styles.notesInput]}
             placeholder="Any additional details"
+            placeholderTextColor={colors.muted}
             value={notes}
             onChangeText={setNotes}
             multiline
             editable={!submitting}
           />
 
-          <Text style={styles.label}>Photo (optional)</Text>
+          <Text style={styles.label}>Photo</Text>
           <PhotoPicker
             onPhotoSelected={(base64) => setPhotoBase64(base64)}
             disabled={submitting}
@@ -274,8 +288,10 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="Seller name"
+            placeholderTextColor={colors.muted}
             value={sellerName}
             onChangeText={setSellerName}
+            autoCapitalize="words"
             editable={!submitting}
           />
 
@@ -283,6 +299,7 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="Phone number"
+            placeholderTextColor={colors.muted}
             value={sellerPhone}
             onChangeText={setSellerPhone}
             keyboardType="phone-pad"
@@ -293,6 +310,7 @@ export default function SellerFlow() {
           <TextInput
             style={styles.input}
             placeholder="Email address"
+            placeholderTextColor={colors.muted}
             value={sellerEmail}
             onChangeText={setSellerEmail}
             keyboardType="email-address"
@@ -308,7 +326,7 @@ export default function SellerFlow() {
             disabled={submitting}
           >
             {submitting ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.white} />
             ) : (
               <Text style={styles.submitButtonText}>Submit Listing</Text>
             )}

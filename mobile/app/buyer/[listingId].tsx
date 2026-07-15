@@ -16,12 +16,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../src/lib/supabase';
 import { createContactRequest, checkContactRequest } from '../../src/lib/api';
+import { useCart } from '../../src/lib/cartStore';
+import QtyStepper from '../../src/components/QtyStepper';
 import type { PublicListing } from '../../src/types';
+import { colors, fonts, radii, spacing } from '../../src/theme';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.ivory,
   },
   center: {
     flex: 1,
@@ -31,99 +34,146 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 15,
-    color: '#c0392b',
+    fontFamily: fonts.body,
+    color: colors.danger,
     textAlign: 'center',
     marginBottom: 16,
   },
   image: {
     width: '100%',
     aspectRatio: 1.2,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.ivoryDark,
   },
   imagePlaceholder: {
     width: '100%',
     aspectRatio: 1.2,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.ivoryDark,
     justifyContent: 'center',
     alignItems: 'center',
   },
   imagePlaceholderText: {
-    color: '#999',
+    color: colors.muted,
+    fontFamily: fonts.body,
   },
   body: {
-    padding: 16,
+    padding: spacing.lg,
+    alignItems: 'center',
   },
   name: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
+    fontFamily: fonts.heading,
+    color: colors.black,
+    textAlign: 'center',
   },
   price: {
-    fontSize: 18,
-    color: '#4CAF50',
-    fontWeight: '700',
+    fontSize: 19,
+    color: colors.gold,
+    fontFamily: fonts.bodyBold,
     marginTop: 6,
   },
   meta: {
     fontSize: 14,
-    color: '#666',
+    fontFamily: fonts.body,
+    color: colors.muted,
     marginTop: 4,
+    textAlign: 'center',
   },
   notes: {
     fontSize: 14,
-    color: '#444',
+    fontFamily: fonts.body,
+    color: colors.black,
     marginTop: 12,
     lineHeight: 20,
+    textAlign: 'center',
+  },
+  stepperWrap: {
+    marginTop: spacing.xl,
+    width: '100%',
+    alignItems: 'center',
+  },
+  stepperLabel: {
+    fontFamily: fonts.bodyMedium,
+    color: colors.muted,
+    fontSize: 13,
+    marginBottom: spacing.sm,
+  },
+  stockMsg: {
+    fontFamily: fonts.bodyMedium,
+    color: colors.danger,
+    fontSize: 13,
+    marginTop: spacing.sm,
+  },
+  addToCartBtn: {
+    marginTop: spacing.lg,
+    backgroundColor: colors.gold,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: radii.md,
+    alignItems: 'center',
+    width: '100%',
+  },
+  addToCartText: {
+    color: colors.white,
+    fontFamily: fonts.bodyBold,
+    fontSize: 16,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-    marginTop: 24,
-    marginBottom: 8,
+    fontSize: 17,
+    fontFamily: fonts.headingMedium,
+    color: colors.black,
+    marginTop: spacing.xxl,
+    marginBottom: spacing.sm,
+    alignSelf: 'flex-start',
   },
   contactBox: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    padding: spacing.lg,
+    width: '100%',
   },
   contactText: {
     fontSize: 15,
-    color: '#333',
+    fontFamily: fonts.body,
+    color: colors.black,
     marginTop: 4,
   },
   pendingText: {
     fontSize: 15,
-    color: '#e67e22',
-    fontWeight: '600',
+    fontFamily: fonts.bodySemiBold,
+    color: colors.gold,
   },
   requestButton: {
     marginTop: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.black,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: radii.sm,
     alignItems: 'center',
   },
   requestButtonDisabled: {
     opacity: 0.6,
   },
   requestButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: colors.white,
+    fontFamily: fonts.bodySemiBold,
     fontSize: 15,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
+    fontFamily: fonts.body,
     marginTop: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
+    color: colors.black,
   },
   formError: {
-    color: '#c0392b',
+    color: colors.danger,
+    fontFamily: fonts.body,
     fontSize: 13,
     marginTop: 8,
   },
@@ -138,6 +188,7 @@ type RequestState =
 export default function ListingDetail() {
   const params = useLocalSearchParams<{ listingId: string; listing?: string }>();
   const listingId = params.listingId;
+  const { addToCart } = useCart();
 
   const [listing, setListing] = useState<PublicListing | null>(
     params.listing ? (JSON.parse(params.listing) as PublicListing) : null
@@ -154,6 +205,10 @@ export default function ListingDetail() {
   const [buyerPhone, setBuyerPhone] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const [cartQty, setCartQty] = useState(1);
+  const [stockMsg, setStockMsg] = useState<string | null>(null);
+  const [addedLabel, setAddedLabel] = useState(false);
 
   const storageKey = `contact_request:${listingId}`;
 
@@ -236,10 +291,38 @@ export default function ListingDetail() {
     }
   };
 
+  const handleQtyChange = (next: number) => {
+    if (!listing) return;
+    if (next > listing.quantity_available) {
+      setStockMsg(`Only ${listing.quantity_available} available`);
+      setCartQty(listing.quantity_available);
+      return;
+    }
+    setStockMsg(null);
+    setCartQty(next);
+  };
+
+  const handleAddToCart = () => {
+    if (!listing) return;
+    addToCart(
+      {
+        listingId: listing.id,
+        name: listing.name,
+        pricePerUnit: listing.price_per_unit,
+        unit: listing.unit,
+        photoUrl: listing.photo_url,
+        quantityAvailable: listing.quantity_available,
+      },
+      cartQty
+    );
+    setAddedLabel(true);
+    setTimeout(() => setAddedLabel(false), 1500);
+  };
+
   if (loadingListing) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color={colors.gold} />
       </SafeAreaView>
     );
   }
@@ -281,10 +364,20 @@ export default function ListingDetail() {
             <Text style={styles.meta}>Seller: {listing.seller_name}</Text>
             {listing.notes ? <Text style={styles.notes}>{listing.notes}</Text> : null}
 
+            <View style={styles.stepperWrap}>
+              <Text style={styles.stepperLabel}>Quantity</Text>
+              <QtyStepper value={cartQty} max={listing.quantity_available} onChange={handleQtyChange} />
+              {stockMsg ? <Text style={styles.stockMsg}>{stockMsg}</Text> : null}
+
+              <TouchableOpacity style={styles.addToCartBtn} onPress={handleAddToCart}>
+                <Text style={styles.addToCartText}>{addedLabel ? 'Added ✓' : 'Add to Cart'}</Text>
+              </TouchableOpacity>
+            </View>
+
             <Text style={styles.sectionTitle}>Contact</Text>
             <View style={styles.contactBox}>
               {checkingRequest ? (
-                <ActivityIndicator color="#4CAF50" />
+                <ActivityIndicator color={colors.gold} />
               ) : requestState.status === 'approved' ? (
                 <>
                   <Text style={styles.contactText}>Name: {requestState.seller_name}</Text>
@@ -307,12 +400,14 @@ export default function ListingDetail() {
                       <TextInput
                         style={styles.input}
                         placeholder="Your name"
+                        placeholderTextColor={colors.muted}
                         value={buyerName}
                         onChangeText={setBuyerName}
                       />
                       <TextInput
                         style={styles.input}
                         placeholder="Your phone number"
+                        placeholderTextColor={colors.muted}
                         value={buyerPhone}
                         onChangeText={setBuyerPhone}
                         keyboardType="phone-pad"

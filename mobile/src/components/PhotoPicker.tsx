@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { colors, fonts, radii } from '../theme';
 
 const styles = StyleSheet.create({
   container: {
@@ -9,20 +10,20 @@ const styles = StyleSheet.create({
   preview: {
     width: '100%',
     aspectRatio: 1.2,
-    borderRadius: 8,
-    backgroundColor: '#e0e0e0',
+    borderRadius: radii.sm,
+    backgroundColor: colors.ivoryDark,
   },
   pickButton: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.gold,
+    borderRadius: radii.sm,
     paddingVertical: 14,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   pickButtonText: {
-    color: '#2196F3',
-    fontWeight: '600',
+    color: colors.gold,
+    fontFamily: fonts.bodySemiBold,
     fontSize: 15,
   },
 });
@@ -73,7 +74,7 @@ export default function PhotoPicker({
         disabled={disabled || picking}
       >
         {picking ? (
-          <ActivityIndicator color="#2196F3" />
+          <ActivityIndicator color={colors.gold} />
         ) : (
           <Text style={styles.pickButtonText}>{previewUri ? 'Change Photo' : 'Add Photo'}</Text>
         )}

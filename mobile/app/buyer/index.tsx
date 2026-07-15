@@ -14,11 +14,13 @@ import { fetchListings, PAGE_SIZE } from '../../src/lib/api';
 import type { PublicListing } from '../../src/types';
 import ListingCard from '../../src/components/ListingCard';
 import PaginationControls from '../../src/components/PaginationControls';
+import Navbar from '../../src/components/Navbar';
+import { colors, fonts, radii } from '../../src/theme';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.ivory,
   },
   center: {
     flex: 1,
@@ -28,23 +30,25 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    fontFamily: fonts.body,
+    color: colors.muted,
   },
   errorText: {
     fontSize: 15,
-    color: '#c0392b',
+    fontFamily: fonts.body,
+    color: colors.danger,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.gold,
     paddingVertical: 10,
     paddingHorizontal: 24,
-    borderRadius: 8,
+    borderRadius: radii.sm,
   },
   retryButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: colors.white,
+    fontFamily: fonts.bodySemiBold,
     fontSize: 15,
   },
   list: {
@@ -96,10 +100,11 @@ export default function BuyerFlow() {
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
+      <Navbar role="buyer" />
       {loading && rows.length === 0 ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#4CAF50" />
+          <ActivityIndicator size="large" color={colors.gold} />
         </View>
       ) : error ? (
         <View style={styles.center}>

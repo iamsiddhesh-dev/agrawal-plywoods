@@ -9,16 +9,22 @@ function randomId(): string {
 }
 
 export async function fetchListings(
-  page: number
+  page: number,
+  searchTerm?: string
 ): Promise<{ rows: PublicListing[]; totalCount: number }> {
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from('public_listings')
     .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(from, to);
+    .order('created_at', { ascending: false });
+
+  if (searchTerm && searchTerm.trim()) {
+    query = query.ilike('name', `%${searchTerm.trim()}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
 
   if (error) throw error;
 

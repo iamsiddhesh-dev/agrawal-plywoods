@@ -185,6 +185,73 @@ begin
   update contact_requests set status = p_status where id = p_id;
 end $$;
 
+-- ============ ADMIN OWNER RPCs (own-stock management) ============
+
+-- Admin creates a listing directly — auto-approved, skips the pending queue.
+create or replace function public.admin_add_listing(
+  p_pin          text,
+  p_name         text,
+  p_price        numeric,
+  p_unit         text,
+  p_quantity     integer,
+  p_notes        text,
+  p_photo_url    text,
+  p_seller_name  text,
+  p_seller_phone text,
+  p_seller_email text
+)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare
+  new_id uuid;
+begin
+  if not public.admin_pin_ok(p_pin) then raise exception 'invalid pin'; end if;
+  insert into listings (
+    name, price_per_unit, unit, quantity_available, notes,
+    photo_url, seller_name, seller_phone, seller_email, status
+  ) values (
+    p_name, p_price, p_unit, p_quantity, p_notes,
+    p_photo_url, p_seller_name, p_seller_phone, p_seller_email, 'approved'
+  )
+  returning id into new_id;
+  return new_id;
+end $$;
+
+grant execute on function public.admin_add_listing(
+  text, text, numeric, text, integer, text, text, text, text, text
+) to anon;
+
+-- Admin deletes any listing regardless of status.
+create or replace function public.admin_delete_listing(p_pin text, p_id uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not public.admin_pin_ok(p_pin) then raise exception 'invalid pin'; end if;
+  delete from listings where id = p_id;
+end $$;
+
+grant execute on function public.admin_delete_listing(text, uuid) to anon;
+
+-- Admin views all listings (any status) for own-stock management.
+create or replace function public.admin_all_listings(p_pin text)
+returns setof public.listings
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.admin_pin_ok(p_pin) then raise exception 'invalid pin'; end if;
+  return query select * from listings order by created_at desc;
+end $$;
+
+grant execute on function public.admin_all_listings(text) to anon;
+
+-- Admin changes their own PIN.
+create or replace function public.admin_change_pin(p_pin text, p_new_pin text)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not public.admin_pin_ok(p_pin) then raise exception 'invalid pin'; end if;
+  if p_new_pin !~ '^[0-9]{4}$' then raise exception 'pin must be 4 digits'; end if;
+  update app_config set value = p_new_pin where key = 'admin_pin';
+end $$;
+
+grant execute on function public.admin_change_pin(text, text) to anon;
+
 -- ============ STORAGE ============
 -- Create bucket 'listing-photos' (public) in the dashboard FIRST, then run:
 create policy "anon uploads listing photos"

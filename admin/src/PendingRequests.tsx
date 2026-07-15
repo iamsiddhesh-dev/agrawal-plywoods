@@ -56,7 +56,8 @@ export default function PendingRequests({ pin }: PendingRequestsProps) {
             <div className="card-body">
               <h3 className="clamp-2">{request.listing_name}</h3>
               <p>
-                Buyer: {request.buyer_name} &middot; {request.buyer_phone}
+                Buyer: {request.buyer_name} &middot;{' '}
+                <span className="contact-highlight">{request.buyer_phone}</span>
               </p>
               <p className="notes">{new Date(request.created_at).toLocaleString()}</p>
               <div className="actions">

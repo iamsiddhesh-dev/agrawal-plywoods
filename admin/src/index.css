@@ -1,14 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
   --text: #3f3a2f;
-  --text-h: #1c1810;
+  --text-h: #1a1a1a;
   --bg: #fdf6e6;
+  --bg-dark: #f3e9d2;
   --card-bg: #ffffff;
   --border: #e3d9bd;
-  --accent: #a8662a;
-  --accent-hover: #8a5320;
-  --danger: #b3413a;
+  --gold: #c9a227;
+  --gold-light: #e8c766;
+  --accent: #c9a227;
+  --accent-hover: #b08e20;
+  --success: #4c7a4c;
+  --danger: #b23a2e;
   --danger-hover: #93332d;
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
 
   font: 16px/145% var(--sans);
   color: var(--text);
@@ -26,6 +33,7 @@ body {
 
 h1, h2, h3 {
   color: var(--text-h);
+  font-family: var(--serif);
   font-weight: 600;
   margin: 0;
 }

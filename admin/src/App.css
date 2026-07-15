@@ -13,18 +13,48 @@
   text-align: center;
 }
 
-.pin-gate-form h1 {
-  font-size: 22px;
-  margin-bottom: 8px;
+.pin-gate-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto 4px;
 }
 
-.pin-gate-form input {
+.pin-gate-form h1 {
   font-size: 20px;
-  letter-spacing: 8px;
+  margin-bottom: 0;
+}
+
+.pin-gate-subtitle {
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+
+.pin-box-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.pin-box {
+  width: 52px;
+  height: 60px;
+  font-size: 24px;
+  font-family: var(--serif);
   text-align: center;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text-h);
+}
+
+.pin-box:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.25);
 }
 
 .pin-gate-form button {
@@ -35,6 +65,9 @@
   background: var(--accent);
   color: #fff;
   cursor: pointer;
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .pin-gate-form button:hover:not(:disabled) {
@@ -47,7 +80,7 @@
 }
 
 .app {
-  max-width: 720px;
+  max-width: 780px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -56,15 +89,47 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
+.app-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-header-title img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  font-size: clamp(16px, 4vw, 22px);
+  overflow-wrap: break-word;
+}
+
 .logout {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 6px 12px;
+  background: var(--card-bg);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.logout:hover {
+  background: var(--bg-dark);
 }
 
 .tabs {
@@ -72,6 +137,7 @@
   gap: 8px;
   margin-bottom: 16px;
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 
 .tabs button {
@@ -132,10 +198,11 @@
 }
 
 .thumb {
-  width: 80px;
-  height: 80px;
+  width: 104px;
+  height: 104px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 2px solid var(--gold-light);
   flex-shrink: 0;
 }
 
@@ -187,11 +254,14 @@
 
 .actions button {
   border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
+  border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
   color: #fff;
   font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .actions button:disabled {
@@ -200,11 +270,11 @@
 }
 
 .approve {
-  background: var(--accent);
+  background: var(--success);
 }
 
 .approve:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: #3d633d;
 }
 
 .reject {
@@ -213,4 +283,82 @@
 
 .reject:hover:not(:disabled) {
   background: var(--danger-hover);
+}
+
+.contact-highlight {
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.stock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.stock-form input,
+.stock-form select,
+.stock-form textarea {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.stock-form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.stock-form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.stock-form-row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.pin-field-label {
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+.success-msg {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.status-badge {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.status-approved {
+  background: rgba(76, 122, 76, 0.15);
+  color: var(--success);
+}
+
+.status-pending {
+  background: rgba(201, 162, 39, 0.18);
+  color: var(--accent-hover);
+}
+
+.status-rejected {
+  background: rgba(178, 58, 46, 0.15);
+  color: var(--danger);
 }

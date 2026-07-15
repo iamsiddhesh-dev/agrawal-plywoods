@@ -2,46 +2,60 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors, fonts, radii, shadow, spacing } from '../src/theme';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    backgroundColor: colors.ivory,
+    padding: spacing.xl,
+  },
+  welcome: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 16,
+    color: colors.muted,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 40,
-    color: '#333',
+    fontFamily: fonts.heading,
+    fontSize: 30,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xxl,
+    color: colors.black,
+    textAlign: 'center',
   },
   button: {
     width: '100%',
-    paddingVertical: 16,
-    marginVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 18,
+    marginVertical: spacing.sm,
+    borderRadius: radii.md,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadow,
   },
   buyerButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.gold,
   },
   sellerButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: colors.black,
+    borderWidth: 1,
+    borderColor: colors.gold,
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fonts.bodyBold,
+    fontSize: 17,
+    color: colors.white,
   },
 });
 
 export default function RolePicker() {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Welcome</Text>
+      <Text style={styles.welcome}>Welcome</Text>
+      <Text style={styles.title}>Who are you?</Text>
 
       <TouchableOpacity
         style={[styles.button, styles.buyerButton]}

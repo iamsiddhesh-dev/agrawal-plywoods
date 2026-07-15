@@ -213,14 +213,14 @@ export default function SellerFlow() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <Navbar role="seller" />
         <ScrollView contentContainerStyle={styles.scrollBody} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Add Listing</Text>
 
-          <Text style={styles.label}>Product name</Text>
+          <Text style={styles.label}>Product Name</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g. 18mm Marine Ply 8x4"
@@ -231,7 +231,7 @@ export default function SellerFlow() {
             editable={!submitting}
           />
 
-          <Text style={styles.label}>Price per unit (₹)</Text>
+          <Text style={styles.label}>Price Per Unit (₹)</Text>
           <TextInput
             style={styles.input}
             placeholder="0.00"
@@ -256,7 +256,7 @@ export default function SellerFlow() {
             ))}
           </View>
 
-          <Text style={styles.label}>Quantity available</Text>
+          <Text style={styles.label}>Quantity Available</Text>
           <TextInput
             style={styles.input}
             placeholder="0"
@@ -267,7 +267,7 @@ export default function SellerFlow() {
             editable={!submitting}
           />
 
-          <Text style={styles.label}>Notes (optional)</Text>
+          <Text style={styles.label}>Notes (Optional)</Text>
           <TextInput
             style={[styles.input, styles.notesInput]}
             placeholder="Any additional details"
@@ -284,7 +284,7 @@ export default function SellerFlow() {
             disabled={submitting}
           />
 
-          <Text style={styles.label}>Your name</Text>
+          <Text style={styles.label}>Your Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Seller name"
@@ -295,7 +295,7 @@ export default function SellerFlow() {
             editable={!submitting}
           />
 
-          <Text style={styles.label}>Your phone</Text>
+          <Text style={styles.label}>Your Phone</Text>
           <TextInput
             style={styles.input}
             placeholder="Phone number"
@@ -306,7 +306,7 @@ export default function SellerFlow() {
             editable={!submitting}
           />
 
-          <Text style={styles.label}>Your email (optional)</Text>
+          <Text style={styles.label}>Your Email (Optional)</Text>
           <TextInput
             style={styles.input}
             placeholder="Email address"

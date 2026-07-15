@@ -1,36 +1,37 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { colors } from '../theme';
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 16,
-    gap: 6,
+    paddingVertical: 20,
+    gap: 8,
   },
   button: {
-    minWidth: 32,
-    height: 32,
-    borderRadius: 6,
+    minWidth: 44,
+    height: 44,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    backgroundColor: '#eee',
+    paddingHorizontal: 12,
+    backgroundColor: colors.ivoryDark,
   },
   buttonActive: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.gold,
   },
   buttonDisabled: {
     opacity: 0.4,
   },
   buttonText: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: 16,
+    color: colors.black,
     fontWeight: '600',
   },
   buttonTextActive: {
-    color: '#fff',
+    color: colors.white,
   },
 });
 

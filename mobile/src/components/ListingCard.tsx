@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   name: {
-    fontSize: 14,
-    fontFamily: fonts.bodySemiBold,
+    fontSize: 15,
+    fontFamily: fonts.headingMedium,
     color: colors.black,
   },
   price: {

@@ -101,9 +101,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   totalLabel: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 15,
-    color: colors.muted,
+    fontFamily: fonts.heading,
+    fontSize: 18,
+    color: colors.black,
   },
   totalValue: {
     fontFamily: fonts.bodyBold,
